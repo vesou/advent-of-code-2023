@@ -2,4 +2,4 @@
 
 using AdventOfCode2023.Day2;
 
-Console.WriteLine(Problem2.Solve1());
+Console.WriteLine(Problem2.Solve1(14, 12, 13));
