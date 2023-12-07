@@ -19,13 +19,14 @@ public class Problem3Tests
             "..592.....",
             "......755.",
             "...$.*....",
-            ".664.598.."
+            ".664.598..",
+            ".880\\/818.",
         };
 
         char[][] inputData = Problem3.TranslateInput(input);
         var result = Problem3.SumOfParts(inputData);
 
-        result.Should().Be(4361);
+        result.Should().Be(4361+880+818);
     }
 
     [Fact]
@@ -33,6 +34,6 @@ public class Problem3Tests
     {
         int result = Problem3.Solve1();
         // 535391 was too high
-        result.Should().Be(3059);
+        result.Should().Be(532445);
     }
 }

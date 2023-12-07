@@ -64,7 +64,7 @@ public class Problem3
         for (int currY = y-1; currY <= y+1; currY++)
         {
             if(currY < 0 || currY >= inputData.Length) continue;
-            for (int currX = x-1; currX <= x+numberSize+1; currX++)
+            for (int currX = x-1; currX <= x+numberSize; currX++)
             {
                 if(currX < 0 || currX >= inputData[currY].Length) continue;
                 if(inputData[currY][currX] is not '.' && !IsDigit(inputData[currY][currX]))
