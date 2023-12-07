@@ -2,18 +2,7 @@ namespace AdventOfCode2023.Day2;
 
 public class Problem2
 {
-    #region Task 1
-
-    public static int Solve1(int maxBlueAllowed, int maxRedAllowed, int maxGreenAllowed)
-    {
-        var inputLines = File.ReadAllLines("Day2/input1.txt").ToList();
-        var games = inputLines.Select(MapIntoGame);
-
-        int successfulGameIndexTotal = games.Select(x => CheckGame(x, maxBlueAllowed, maxRedAllowed, maxGreenAllowed) ? x.Number : 0).Sum();
-
-        return successfulGameIndexTotal;
-    }
-
+    #region Task 2
     public static int Solve2()
     {
         var inputLines = File.ReadAllLines("Day2/input1.txt").ToList();
@@ -27,6 +16,20 @@ public class Problem2
     public static int GetMultipliedSumOfMaxValues(Game game)
     {
         return game.MaxBlue * game.MaxRed * game.MaxGreen;
+    }
+
+    #endregion
+
+    #region Task 1
+
+    public static int Solve1(int maxBlueAllowed, int maxRedAllowed, int maxGreenAllowed)
+    {
+        var inputLines = File.ReadAllLines("Day2/input1.txt").ToList();
+        var games = inputLines.Select(MapIntoGame);
+
+        int successfulGameIndexTotal = games.Select(x => CheckGame(x, maxBlueAllowed, maxRedAllowed, maxGreenAllowed) ? x.Number : 0).Sum();
+
+        return successfulGameIndexTotal;
     }
 
     public static bool CheckGame(Game game, int maxBlueAllowed, int maxRedAllowed, int maxGreenAllowed)
