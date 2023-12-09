@@ -66,6 +66,6 @@ public class Problem3Tests
     {
         int result = Problem3.Solve2();
 
-        result.Should().Be(532445);
+        result.Should().Be(79842967);
     }
 }
