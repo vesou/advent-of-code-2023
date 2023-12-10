@@ -7,8 +7,14 @@ public class Problem10
     public static int Solve2()
     {
         var inputLines = File.ReadAllLines("Day10/input1.txt").ToList();
+        var maze = TranslateInput(inputLines);
 
-        return 0;
+        return CountTilesEnclosedByMainLoop(maze);
+    }
+
+    public static int CountTilesEnclosedByMainLoop(Maze maze)
+    {
+        return maze.Tiles.SelectMany(tiles => tiles).Count(tile => tile.IsInsideMainLoop);
     }
 
     #endregion
@@ -81,12 +87,160 @@ public class Maze
         {
             Tile currentTile = tilesToProcess.Dequeue();
             Tiles[currentTile.Y][currentTile.X].Processed = true;
+            Tiles[currentTile.Y][currentTile.X].PartOfMainLoop = true;
             foreach (Tile neighbour in currentTile.Neighbours.Where(tile => !tile.Processed))
             {
+
                 neighbour.DistanceFromStart = currentTile.DistanceFromStart + 1;
                 tilesToProcess.Enqueue(neighbour);
             }
         }
+
+        // find out which direction is inside by counting number of turns
+        Tile nextNeighbour = startTile.Neighbours[0];
+        bool isAntiClockwise = NumberOfLeftTurnsIsMoreThanRightTurns(startTile, nextNeighbour);
+
+        Queue<(Tile previousTile, Tile currentTile)> tilesToProcess2 = new();
+        tilesToProcess2.Enqueue((startTile, nextNeighbour));
+        while (tilesToProcess2.Any())
+        {
+            (Tile previousTile, Tile currentTile) = tilesToProcess2.Dequeue();
+            MarkAllInsideTiles(Tiles, currentTile, previousTile, isAntiClockwise);
+            Tile neighbour = currentTile.Neighbours.First(tile => tile != previousTile);
+            if(neighbour == startTile)
+                break;
+            tilesToProcess2.Enqueue((currentTile, neighbour));
+        }
+
+    }
+
+    private void MarkAllInsideTiles(Tile[][] tiles, Tile currentTile, Tile previousTile, bool isAntiClockwiseDirection)
+    {
+        List<char> notAllowedTiles = new List<char>();
+        int xMovement = previousTile.X - currentTile.X;
+        int yMovement = previousTile.Y - currentTile.Y;
+        int insideDirectionY = isAntiClockwiseDirection ? 1 : -1;
+
+        if (xMovement != 0)
+        {
+            insideDirectionY *= xMovement;
+        }
+        else if (yMovement != 0)
+        {
+            insideDirectionY += yMovement;
+        }
+
+        if(yMovement < 0) // moving down on board
+        {
+            notAllowedTiles.Add('|');
+            if(isAntiClockwiseDirection)
+                notAllowedTiles.Add('L');
+            else
+                notAllowedTiles.Add('J');
+
+            insideDirectionY = 1;
+        }
+
+        if(yMovement > 0) // moving up the board
+        {
+            notAllowedTiles.Add('|');
+            if(isAntiClockwiseDirection)
+                notAllowedTiles.Add('7');
+            else
+                notAllowedTiles.Add('F');
+
+            insideDirectionY = -1;
+        }
+
+        if (notAllowedTiles.Contains(currentTile.TileChar)) return;
+
+        int currY = currentTile.Y + insideDirectionY;
+        int currX = currentTile.X;
+        while (currY >= 0 && currY < tiles.Length && !tiles[currY][currX].PartOfMainLoop)
+        {
+            tiles[currY][currX].IsInsideMainLoop = true;
+            currY += insideDirectionY;
+        }
+    }
+
+    private bool NumberOfLeftTurnsIsMoreThanRightTurns(Tile startTile, Tile nextNeighbour)
+    {
+        int numberOfLeftTurns = 0;
+        int numberOfRightTurns = 0;
+        Tile previousTile = startTile;
+        Tile currentTile = nextNeighbour;
+
+        while (true)
+        {
+            Tile nextTile = GetNextTile(currentTile, previousTile);
+
+            if(nextTile.TileChar == TileType.Start.Type)
+                break;
+            if (IsLeftTurn(currentTile, nextTile))
+            {
+                numberOfLeftTurns++;
+            }
+            else if (nextTile.TileChar == TileType.HorizontalPipe.Type || nextTile.TileChar == TileType.VerticalPipe.Type)
+            {
+                // do nothing
+            }
+            else
+            {
+                numberOfRightTurns++;
+            }
+
+            previousTile = currentTile;
+            currentTile = nextTile;
+        }
+
+        return numberOfLeftTurns > numberOfRightTurns;
+    }
+
+    private bool IsLeftTurn(Tile currentTile, Tile nextTile)
+    {
+        if (IsTop(nextTile.Y, currentTile.Y))
+        {
+            return nextTile.TileChar == TileType.SouthWestBend.Type;
+        }
+        else if (IsBottom(nextTile.Y, currentTile.Y))
+        {
+            return nextTile.TileChar == TileType.NorthEastBend.Type;
+        }
+        else if (IsLeft(nextTile.X, currentTile.X))
+        {
+            return nextTile.TileChar == TileType.SouthEastBend.Type;
+        }
+        else if (IsRight(nextTile.X, currentTile.X))
+        {
+            return nextTile.TileChar == TileType.NorthWestBend.Type;
+        }
+
+        return false;
+    }
+
+    private bool IsRight(int nextTileX, int currentTileX)
+    {
+        return nextTileX > currentTileX;
+    }
+
+    private bool IsLeft(int nextTileX, int currentTileX)
+    {
+        return nextTileX < currentTileX;
+    }
+
+    private bool IsBottom(int nextTileY, int currentTileY)
+    {
+        return nextTileY > currentTileY;
+    }
+
+    private bool IsTop(int nextTileY, int currentTileY)
+    {
+        return nextTileY < currentTileY;
+    }
+
+    private Tile GetNextTile(Tile currentTile, Tile previousTile)
+    {
+        return currentTile.Neighbours.First(tile => tile != previousTile);
     }
 
     private Tile? GetNeighbour(Tile[][] tiles, int neighbourY, int neighbourX)
@@ -172,6 +326,8 @@ public class Tile
     public Tile[] Neighbours { get; set; }
     public int DistanceFromStart { get; set; } = -1;
     public bool Processed { get; set; } = false;
+    public bool IsInsideMainLoop { get; set; } = false;
+    public bool PartOfMainLoop { get; set; } = false;
 }
 
 /*
