@@ -112,6 +112,6 @@ public class Problem11Tests
     public void Solve2_FullTest()
     {
         long result = Problem11.Solve2(1_000_000);
-        result.Should().Be(0);
+        result.Should().Be(742305960572L);
     }
 }
