@@ -7,12 +7,130 @@ public class Problem11
 
     #region Task 2
 
-    public static int Solve2()
+    public static long Solve2(int expansionSize)
     {
         var inputLines = File.ReadAllLines("Day11/input1.txt").ToList();
-        var maze = TranslateInput(inputLines);
+        var universe = TranslateInput(inputLines);
+        (var rowsToExpand, var columnsToExpand) = FindExpandingRowsAndColumns(universe.Matrix);
+        universe.RowsToExpand = rowsToExpand;
+        universe.ColumnsToExpand = columnsToExpand;
 
-        return 0;
+        var result = SumAllPaths2(universe, expansionSize);
+
+        return result;
+    }
+
+    public static (bool[] rowsToExpand, bool[] columnsToExpand) FindExpandingRowsAndColumns(char[][] matrix)
+    {
+        bool[] rowsToExpand = new bool[matrix.Length];
+
+        for (int y = 0; y < matrix.Length; y++)
+        {
+            if (matrix[y].All(x => x == Problem11.SpaceChar))
+            {
+                rowsToExpand[y] = true;
+            }
+        }
+
+        bool[] columnsToExpand = new bool[matrix[0].Length];
+        for (int x = 0; x < matrix[0].Length; x++)
+        {
+            bool shouldExpand = true;
+            for (int y = 0; y < matrix.Length; y++)
+            {
+                if (matrix[y][x] != Problem11.SpaceChar) shouldExpand = false;
+            }
+
+            columnsToExpand[x] = shouldExpand;
+        }
+
+        return (rowsToExpand, columnsToExpand);
+    }
+
+    public static long SumAllPaths2(Universe universe, int expansionSize)
+    {
+        List<PathToCalculate> allPaths = FindAllPaths2(universe, expansionSize);
+
+        return allPaths.Sum(x => (long)x.MinimalPath);
+    }
+
+    public static List<PathToCalculate> FindAllPaths2(Universe universe, int expansionSize)
+    {
+        List<PathToCalculate> paths = new List<PathToCalculate>();
+        Galaxy[] galaxies = FindAllGalaxies(universe.Matrix);
+        bool[][] visited = new bool[galaxies.Length][];
+
+        for (int i = 0; i < galaxies.Length; i++)
+            visited[i] = new bool[galaxies.Length];
+
+        for (int i = 0; i < galaxies.Length; i++)
+        {
+            for (int j = 0; j < galaxies.Length; j++)
+            {
+                if (j == i) continue;
+                if(visited[i][j]) continue;
+                if(visited[j][i]) continue;
+
+                paths.Add(new PathToCalculate
+                {
+                    PointA = galaxies[i],
+                    PointB = galaxies[j],
+                    MinimalPath = CalculateShortestPath2(galaxies[i], galaxies[j], universe.RowsToExpand, universe.ColumnsToExpand, expansionSize)
+                });
+
+                visited[i][j] = true;
+                visited[j][i] = true;
+            }
+        }
+
+        return paths;
+    }
+
+
+    public static int CalculateShortestPath2(Galaxy pointA, Galaxy pointB, bool[] universeRowsToExpand, bool[] universeColumnsToExpand, int expansionSize)
+    {
+        int horizontalDistance = CalculateHorizontalDistance(pointA.X, pointB.X, universeColumnsToExpand, expansionSize);
+        int verticalDistance = CalculateVerticalDistance(pointA.Y, pointB.Y, universeRowsToExpand, expansionSize);
+
+        return horizontalDistance + verticalDistance;
+    }
+
+    private static int CalculateVerticalDistance(int pointAY, int pointBY, bool[] universeRowsToExpand, int expansionSize)
+    {
+        int smallerY = pointAY <= pointBY ? pointAY : pointBY;
+        int biggerY = pointAY > pointBY ? pointAY : pointBY;
+        int wholeDistance = 0;
+        for (int x = smallerY; x < biggerY; x++)
+        {
+            int distance = 1;
+            if (universeRowsToExpand[x])
+            {
+                distance *= expansionSize;
+            }
+
+            wholeDistance += distance;
+        }
+
+        return wholeDistance;
+    }
+
+    public static int CalculateHorizontalDistance(int pointAX, int pointBX, bool[] universeColumnsToExpand, int expansionSize)
+    {
+        int smallerX = pointAX <= pointBX ? pointAX : pointBX;
+        int biggerX = pointAX > pointBX ? pointAX : pointBX;
+        int wholeDistance = 0;
+        for (int x = smallerX; x < biggerX; x++)
+        {
+            int distance = 1;
+            if (universeColumnsToExpand[x])
+            {
+                distance *= expansionSize;
+            }
+
+            wholeDistance += distance;
+        }
+
+        return wholeDistance;
     }
 
     #endregion
@@ -187,4 +305,7 @@ public class Universe
     }
 
     public char[][] Matrix { get; set; }
+
+    public bool[] RowsToExpand { get; set; }
+    public bool[] ColumnsToExpand { get; set; }
 }

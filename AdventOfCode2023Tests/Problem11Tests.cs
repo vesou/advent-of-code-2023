@@ -75,6 +75,43 @@ public class Problem11Tests
         int result = Problem11.Solve1();
         // 18890336 was too high
         result.Should().BeLessThan(18890336);
-        result.Should().Be(18890336);
+        result.Should().Be(9445168);
+    }
+
+    [Theory]
+    [InlineData(0, 3, 10, 12)]
+    public void Solve2_CalculateHorizontalDistance(int x1, int x2, int expansionSize, int horizontalDistance)
+    {
+        List<string> inputLines = "...#......\n.......#..\n#.........\n..........\n......#...\n.#........\n.........#\n..........\n.......#..\n#...#....."
+            .Split("\n")
+            .ToList();
+        var universe = Problem11.TranslateInput(inputLines);
+        var expansionResult = Problem11.FindExpandingRowsAndColumns(universe.Matrix);
+        int result = Problem11.CalculateHorizontalDistance(x1, x2, expansionResult.columnsToExpand, expansionSize);
+        result.Should().Be(horizontalDistance);
+    }
+
+    [Theory]
+    [InlineData(10, 1030)]
+    [InlineData(100, 8410)]
+    public void Solve2_SumAllPaths2(int expansionSize, int expected)
+    {
+        List<string> inputLines = "...#......\n.......#..\n#.........\n..........\n......#...\n.#........\n.........#\n..........\n.......#..\n#...#....."
+            .Split("\n")
+            .ToList();
+        var universe = Problem11.TranslateInput(inputLines);
+        (var rowsToExpand, var columnsToExpand) = Problem11.FindExpandingRowsAndColumns(universe.Matrix);
+        universe.RowsToExpand = rowsToExpand;
+        universe.ColumnsToExpand = columnsToExpand;
+
+        var result = Problem11.SumAllPaths2(universe, expansionSize);
+        result.Should().Be(expected);
+    }
+
+    [Fact]
+    public void Solve2_FullTest()
+    {
+        long result = Problem11.Solve2(1_000_000);
+        result.Should().Be(0);
     }
 }
