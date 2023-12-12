@@ -1,4 +1,4 @@
-namespace AdventOfCode2023.Day4;
+namespace AdventOfCode2023.Day04;
 
 public class Problem4
 {
@@ -6,7 +6,7 @@ public class Problem4
 
     public static int Solve2()
     {
-        var inputLines = File.ReadAllLines("Day4/input1.txt").ToList();
+        var inputLines = File.ReadAllLines("Day04/input1.txt").ToList();
         // remove Card 1: from each line
         inputLines = inputLines.Select(x => x.Substring(x.IndexOf(":")+2)).ToList();
         List<ScratchCardGame> scratchCardGames = TranslateInput(inputLines);
@@ -57,7 +57,7 @@ public class Problem4
 
     public static int Solve1()
     {
-        var inputLines = File.ReadAllLines("Day4/input1.txt").ToList();
+        var inputLines = File.ReadAllLines("Day04/input1.txt").ToList();
         // remove Card 1: from each line
         inputLines = inputLines.Select(x => x.Substring(x.IndexOf(":")+2)).ToList();
 

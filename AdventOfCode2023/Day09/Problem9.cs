@@ -1,4 +1,4 @@
-namespace AdventOfCode2023.Day9;
+namespace AdventOfCode2023.Day09;
 
 public class Problem9
 {
@@ -6,7 +6,7 @@ public class Problem9
 
     public static int Solve2()
     {
-        var inputLines = File.ReadAllLines("Day9/input1.txt").ToList();
+        var inputLines = File.ReadAllLines("Day09/input1.txt").ToList();
 
         List<Oasis> reports = TranslateInput(inputLines);
 
@@ -49,7 +49,7 @@ public class Problem9
 
     public static int Solve1()
     {
-        var inputLines = File.ReadAllLines("Day9/input1.txt").ToList();
+        var inputLines = File.ReadAllLines("Day09/input1.txt").ToList();
 
         List<Oasis> reports = TranslateInput(inputLines);
 

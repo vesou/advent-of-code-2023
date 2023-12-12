@@ -1,4 +1,4 @@
-namespace AdventOfCode2023.Day5;
+namespace AdventOfCode2023.Day05;
 
 public class Problem5
 {
@@ -6,7 +6,7 @@ public class Problem5
 
     public static int Solve2()
     {
-        var inputLines = File.ReadAllLines("Day5/input1.txt").ToList();
+        var inputLines = File.ReadAllLines("Day05/input1.txt").ToList();
 
         return 0;
     }
@@ -19,7 +19,7 @@ public class Problem5
 
     public static int Solve1()
     {
-        var inputLines = File.ReadAllLines("Day5/input1.txt").ToList();
+        var inputLines = File.ReadAllLines("Day05/input1.txt").ToList();
 
         return 0;
     }

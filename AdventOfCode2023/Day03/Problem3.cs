@@ -1,11 +1,11 @@
-namespace AdventOfCode2023.Day3;
+namespace AdventOfCode2023.Day03;
 
 public class Problem3
 {
     #region Task 2
     public static int Solve2()
     {
-        var inputLines = File.ReadAllLines("Day3/input1.txt").ToList();
+        var inputLines = File.ReadAllLines("Day03/input1.txt").ToList();
         var inputData = TranslateInput(inputLines);
 
         return SumOfGears(inputData);
@@ -159,7 +159,7 @@ public class Problem3
 
     public static int Solve1()
     {
-        var inputLines = File.ReadAllLines("Day3/input1.txt").ToList();
+        var inputLines = File.ReadAllLines("Day03/input1.txt").ToList();
         var inputData = TranslateInput(inputLines);
 
         return SumOfParts(inputData);

@@ -1,4 +1,4 @@
-namespace AdventOfCode2023.Day1;
+namespace AdventOfCode2023.Day01;
 
 public class Problem1
 {
@@ -20,7 +20,7 @@ public class Problem1
 
     public static int Solve2()
     {
-        var inputLines = File.ReadAllLines("Day1/input1.txt").ToList();
+        var inputLines = File.ReadAllLines("Day01/input1.txt").ToList();
 
         var totalSum = SumLines2(inputLines, Translator2);
         return totalSum;
@@ -94,7 +94,7 @@ public class Problem1
 
     public static int Solve1()
     {
-        var inputLines = File.ReadAllLines("Day1/input1.txt").ToList();
+        var inputLines = File.ReadAllLines("Day01/input1.txt").ToList();
 
         var totalSum = SumLines1(inputLines, Translator);
         return totalSum;
