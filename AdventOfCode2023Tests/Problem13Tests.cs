@@ -59,4 +59,27 @@ public class Problem13Tests
 
         result.Should().Be(16);
     }
+
+    [Fact]
+    public void Solve2_FindMirrorIndexes()
+    {
+        List<string> inputLines = new List<string>()
+        {
+            "#.##..##.\n..#.##.#.\n##......#\n##......#\n..#.##.#.\n..##..##.\n#.#.##.#.\n\n#...##..#\n#....#..#\n..##..###\n#####.##.\n#####.##.\n..##..###\n#....#..#"
+        };
+        inputLines = inputLines.SelectMany(x => x.Split("\n")).ToList();
+        var rockFormations = Problem13.TranslateInput(inputLines);
+        Problem13.FindMirrorIndexes2(rockFormations);
+        var result = Problem13.SumMirrorIndexes(rockFormations);
+
+        result.Should().Be(400);
+    }
+
+    [Fact]
+    public void Solve2_FullTest()
+    {
+        var result = Problem13.Solve2();
+
+        result.Should().Be(27587);
+    }
 }

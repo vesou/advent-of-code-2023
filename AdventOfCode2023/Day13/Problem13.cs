@@ -10,10 +10,108 @@ public class Problem13
     {
         var inputLines = File.ReadAllLines("Day13/input1.txt").ToList();
 
-        return 0;
+        List<RockFormation> rockFormations = TranslateInput(inputLines);
+        FindMirrorIndexes2(rockFormations);
+
+        return SumMirrorIndexes(rockFormations);
     }
 
+    public static void FindMirrorIndexes2(List<RockFormation> rockFormations)
+    {
+        foreach (var rockFormation in rockFormations)
+        {
+            var horizontalMirrorIndex = FindHorizontalMirrorIndex2(rockFormation);
+            rockFormation.HorizontalMirrorIndex = horizontalMirrorIndex;
+            var verticalMirrorIndex = FindVerticalMirrorIndex2(rockFormation);
+            rockFormation.VerticalMirrorIndex = verticalMirrorIndex;
+        }
+    }
 
+    private static int? FindVerticalMirrorIndex2(RockFormation rockFormation)
+    {
+        int horizontalSize = rockFormation.Rocks[0].Length;
+        for (int x = 1; x < horizontalSize; x++)
+        {
+            // find out if the columns before are a mirror representation of the columns after x
+            // check is mirror by going out from X -1 and +1 and comparing the chars
+            int searchIndex = 1;
+            bool isMirror = true;
+            int totalNumberOfDifferences = 0;
+            while(x - searchIndex >= 0 && x + searchIndex - 1 < horizontalSize)
+            {
+                char[] line1 = GetVerticalLine(rockFormation.Rocks, x - searchIndex);
+                char[] line2 = GetVerticalLine(rockFormation.Rocks, x + searchIndex - 1 );
+                (bool doesItMatch, int numberOfDifferentFormations) = IsPotentialMirror(line1, line2);
+                totalNumberOfDifferences += numberOfDifferentFormations;
+                if (totalNumberOfDifferences > 1 || !doesItMatch)
+                {
+                    isMirror = false;
+                    break;
+                }
+                searchIndex++;
+            }
+
+            if (totalNumberOfDifferences != 1 && isMirror)
+                isMirror = false;
+
+            if(isMirror)
+            {
+                return x;
+            }
+        }
+
+        return null;
+    }
+
+    private static int? FindHorizontalMirrorIndex2(RockFormation rockFormation)
+    {
+        int verticalSize = rockFormation.Rocks.Length;
+        for (int y = 1; y < verticalSize; y++)
+        {
+            // find out if the rows above are a mirror representation of the rows below y
+            // check is mirror by going out from Y -1 and +1 and comparing the chars
+            int searchIndex = 1;
+            bool isMirror = true;
+            int totalNumberOfDifferences = 0;
+            while(y - searchIndex >= 0 && y + searchIndex - 1 < verticalSize)
+            {
+                (bool doesItMatch, int numberOfDifferentFormations) = IsPotentialMirror(rockFormation.Rocks[y - searchIndex], rockFormation.Rocks[y + searchIndex - 1 ]);
+                totalNumberOfDifferences += numberOfDifferentFormations;
+                if (totalNumberOfDifferences > 1 || !doesItMatch)
+                {
+                    isMirror = false;
+                    break;
+                }
+                searchIndex++;
+            }
+
+            if (totalNumberOfDifferences != 1 && isMirror)
+                isMirror = false;
+
+            if(isMirror)
+            {
+                return y;
+            }
+        }
+
+        return null;
+    }
+
+    private static (bool doesItMatch, int numberOfDifferentFormations) IsPotentialMirror(char[] line1, char[] line2)
+    {
+        bool rowDiffFound = false;
+        if (line1.SequenceEqual(line2))
+            return (true, 0);
+        for (int i = 0; i < line1.Length; i++)
+        {
+            if (line1[i] == line2[i]) continue;
+            if(rowDiffFound)
+                return (false, 0);
+            rowDiffFound = true;
+        }
+
+        return (true, 1);
+    }
 
     #endregion
 
