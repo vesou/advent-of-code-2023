@@ -10,18 +10,53 @@ public class Problem13Tests
     {
         var result = Problem13.Solve1();
 
-        result.Should().Be(0);
+        result.Should().BeGreaterThan(25906);
+        result.Should().BeGreaterThan(42906);
+        result.Should().Be(42974);
     }
 
-    [Theory]
-    [InlineData("???.### 1,1,3", 1)]
-    public void Solve1_GetNumberOfCombinations(string inputLine, int numberOfCombinations)
+    [Fact]
+    public void Solve1_FindMirrorIndexes()
     {
-        List<string> inputLines = new List<string>();
-        inputLines.Add(inputLine);
-        var dmgReport = Problem13.TranslateInput(inputLines);
-        var result = Problem13.Solve1();
+        List<string> inputLines = new List<string>()
+        {
+            "#.##..##.\n..#.##.#.\n##......#\n##......#\n..#.##.#.\n..##..##.\n#.#.##.#.\n\n#...##..#\n#....#..#\n..##..###\n#####.##.\n#####.##.\n..##..###\n#....#..#"
+        };
+        inputLines = inputLines.SelectMany(x => x.Split("\n")).ToList();
+        var rockFormations = Problem13.TranslateInput(inputLines);
+        Problem13.FindMirrorIndexes(rockFormations);
+        var result = Problem13.SumMirrorIndexes(rockFormations);
 
-        result.Should().Be(numberOfCombinations);
+        result.Should().Be(405);
+    }
+
+    [Fact]
+    public void Solve1_FindMirrorIndexes2()
+    {
+        List<string> inputLines = new List<string>()
+        {
+            "#..#.#.###..#.#.#\n#.#..##.#.#####.#\n####.#####.#.....\n####.#####.#.....\n#.#..##.#.#####.#\n#..###.###..#.#.#\n..#.#.#.....##.##\n.#.#..##.##..##..\n.#.#..##.##..##.."
+        };
+        inputLines = inputLines.SelectMany(x => x.Split("\n")).ToList();
+        var rockFormations = Problem13.TranslateInput(inputLines);
+        Problem13.FindMirrorIndexes(rockFormations);
+        var result = Problem13.SumMirrorIndexes(rockFormations);
+
+        result.Should().Be(800);
+    }
+
+    [Fact]
+    public void Solve1_FindMirrorIndexes3()
+    {
+        List<string> inputLines = new List<string>()
+        {
+            "......####.......\n#..###....###.###\n.##..##..##..##..\n.#..###..###..#..\n...#.#....#.#....\n.#.##.#..#.##.#..\n####.######.#####\n##....#..#....###\n.####..##..####.."
+        };
+        inputLines = inputLines.SelectMany(x => x.Split("\n")).ToList();
+        var rockFormations = Problem13.TranslateInput(inputLines);
+        Problem13.FindMirrorIndexes(rockFormations);
+        var result = Problem13.SumMirrorIndexes(rockFormations);
+
+        result.Should().Be(16);
     }
 }
