@@ -7,38 +7,10 @@ public class Problem5
     public static long Solve2()
     {
         var inputLines = File.ReadAllLines("Day05/input1.txt").ToList();
-        var allData = TranslateInput2(inputLines);
+        var allData = TranslateInput(inputLines);
         var result = allData.FindLowestLocation();
 
         return result;
-    }
-
-    public static Data TranslateInput2(List<string> inputLines)
-    {
-        Data data = new Data();
-        data.Seeds = inputLines[0].Substring("seeds: ".Length).Split(" ").Select(long.Parse).ToList();
-        data.SeedRanges = new List<(long, long)>();
-        for (int i = 0; i < data.Seeds.Count; i+=2)
-        {
-            data.SeedRanges.Add((data.Seeds[i], data.Seeds[i + 1]));
-        }
-
-        int indexOfSeedToSoil = inputLines.IndexOf("seed-to-soil map:");
-        int indexOfSoilToFertilizer = inputLines.IndexOf("soil-to-fertilizer map:");
-        int indexOfFertilizerToWater = inputLines.IndexOf("fertilizer-to-water map:");
-        int indexOfWaterToLight = inputLines.IndexOf("water-to-light map:");
-        int indexOfLightToTemperature = inputLines.IndexOf("light-to-temperature map:");
-        int indexOfTemperatureToHumidity = inputLines.IndexOf("temperature-to-humidity map:");
-        int indexOfHumidityToLocation = inputLines.IndexOf("humidity-to-location map:");
-        data.SeedToSoil = GetRuleSet(inputLines, indexOfSeedToSoil, indexOfSoilToFertilizer);
-        data.SoilToFertilizer = GetRuleSet(inputLines, indexOfSoilToFertilizer, indexOfFertilizerToWater);
-        data.FertilizerToWater = GetRuleSet(inputLines, indexOfFertilizerToWater, indexOfWaterToLight);
-        data.WaterToLight = GetRuleSet(inputLines, indexOfWaterToLight, indexOfLightToTemperature);
-        data.LightToTemperature = GetRuleSet(inputLines, indexOfLightToTemperature, indexOfTemperatureToHumidity);
-        data.TemperatureToHumidity = GetRuleSet(inputLines, indexOfTemperatureToHumidity, indexOfHumidityToLocation);
-        data.HumidityToLocation = GetRuleSet(inputLines, indexOfHumidityToLocation, inputLines.Count);
-
-        return data;
     }
 
     #endregion
@@ -65,7 +37,12 @@ public class Problem5
     {
         Data data = new Data();
         data.Seeds = inputLines[0].Substring("seeds: ".Length).Split(" ").Select(long.Parse).ToList();
-        data.SeedToSoil = new RuleSet();
+        data.SeedRanges = new List<(long, long)>();
+        for (int i = 0; i < data.Seeds.Count; i+=2)
+        {
+            data.SeedRanges.Add((data.Seeds[i], data.Seeds[i + 1]));
+        }
+
         int indexOfSeedToSoil = inputLines.IndexOf("seed-to-soil map:");
         int indexOfSoilToFertilizer = inputLines.IndexOf("soil-to-fertilizer map:");
         int indexOfFertilizerToWater = inputLines.IndexOf("fertilizer-to-water map:");
@@ -131,6 +108,15 @@ public class Data()
     public long FindLowestLocation()
     {
         long lowestLocation = long.MaxValue;
+        foreach (var seedRange in SeedRanges)
+        {
+            for (long i = seedRange.Item1; i < seedRange.Item1 + seedRange.Item2; i++)
+            {
+                var location = TranslateSeedToLocation(i);
+                if(location < lowestLocation)
+                    lowestLocation = location;
+            }
+        }
 
         return lowestLocation;
     }
