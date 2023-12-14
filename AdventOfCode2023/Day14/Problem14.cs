@@ -30,7 +30,7 @@ public class Problem14
 
         RockFormation rockFormations = TranslateInput(inputLines);
 
-        return CalculateTotalLoad(rockFormations);
+        return MoveNorthAndCalculateTotalLoad(rockFormations);
     }
 
 
@@ -49,19 +49,19 @@ public class Problem14
 
         return load;
     }
-    public static long CalculateTotalLoad(RockFormation rockFormations)
+    public static long MoveNorthAndCalculateTotalLoad(RockFormation rockFormations)
     {
         char[][] rocks = rockFormations.Rocks;
         long totalLoad = 0;
         for (int x = 0; x < rocks[0].Length; x++)
         {
-            totalLoad += CalculateLineLoad(rocks, x);
+            totalLoad += MoveRocksNorthAndCalculateLineLoad(rocks, x);
         }
 
         return totalLoad;
     }
 
-    public static long CalculateLineLoad(char[][] rocks, int x)
+    public static long MoveRocksNorthAndCalculateLineLoad(char[][] rocks, int x)
     {
         long load = 0;
         long extraLoad = 0;

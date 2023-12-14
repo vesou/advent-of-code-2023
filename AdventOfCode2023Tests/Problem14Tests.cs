@@ -42,7 +42,7 @@ public class Problem14Tests
         inputLines = inputLines.SelectMany(x => x.Split("\n")).ToList();
         var rockFormations = Problem14.TranslateInput(inputLines);
 
-        var result = Problem14.CalculateLineLoad(rockFormations.Rocks, x);
+        var result = Problem14.MoveRocksNorthAndCalculateLineLoad(rockFormations.Rocks, x);
 
         result.Should().Be(expectedResult);
     }
@@ -57,7 +57,7 @@ public class Problem14Tests
         inputLines = inputLines.SelectMany(x => x.Split("\n")).ToList();
         var rockFormations = Problem14.TranslateInput(inputLines);
 
-        var result = Problem14.CalculateTotalLoad(rockFormations);
+        var result = Problem14.MoveNorthAndCalculateTotalLoad(rockFormations);
 
         result.Should().Be(136);
     }
