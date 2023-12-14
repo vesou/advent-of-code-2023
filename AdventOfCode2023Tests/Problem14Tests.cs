@@ -264,7 +264,7 @@ public class Problem14Tests
 
         inputLines = inputLines.SelectMany(x => x.Split("\n")).ToList();
         var rockFormations = Problem14.TranslateInput(inputLines);
-        rockFormations.Spin(3);
+        rockFormations.Spin2(3);
 
         rockFormations.Rocks[0].Should().BeEquivalentTo(expectedArray[0]);
         rockFormations.Rocks[1].Should().BeEquivalentTo(expectedArray[1]);
@@ -314,5 +314,22 @@ _testOutputHelper.WriteLine(stopwatch.ElapsedMilliseconds.ToString());
         var result = Problem14.CalculateTotalLoad(rockFormations);
 
         result.Should().Be(64);
-    }
+    } // 8,1;
+      // 5,4;
+      // 6,4;
+      // 7,4;
+      // 1,5;
+      // 6,5;
+      // 4,6;
+      // 9,6;
+      // 6,7;
+      // 7,7;
+      // 8,7;
+      // 9,7;
+      // 9,8;
+      // 2,9;
+      // 3,9;
+      // 4,9;
+      // 8,9;
+      // 9,9;
 }

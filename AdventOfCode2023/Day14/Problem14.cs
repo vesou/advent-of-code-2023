@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace AdventOfCode2023.Day14;
 
 public class Problem14
@@ -87,16 +89,52 @@ public class RockFormation
     }
 
     public char[][] Rocks { get; set; }
+    public List<(int iteration, string positionBefore, string positionAfter)> States { get; set; } =
+        new List<(int iteration, string positionBefore, string postitionAfter)>();
 
     public void Spin2(int numberOfSpins)
     {
+        bool cycleFound = false;
         for (int i = 0; i < numberOfSpins; i++)
         {
+            string positionBefore = GetPosition();
+            if (!cycleFound && States.Any(x => x.positionBefore == positionBefore))
+            {
+                int index = States.FindIndex(x => x.positionBefore == positionBefore);
+                int cycleLength = i - index;
+                int remainingSpins = numberOfSpins - i;
+                int remainingSpinsInCycle = remainingSpins % cycleLength;
+                i = numberOfSpins - remainingSpinsInCycle;
+                cycleFound = true;
+            }
             MoveUp();
             MoveLeft();
             MoveDown();
             MoveRight();
+
+            string positionAfter = GetPosition();
+            SaveState(i, positionBefore, positionAfter);
         }
+    }
+
+    private void SaveState(int i, string positionBefore, string positionAfter)
+    {
+        States.Add((i, positionBefore, positionAfter));
+    }
+
+    private string GetPosition()
+    {
+        StringBuilder sb = new StringBuilder();
+        for (int y = 0; y < Rocks.Length; y++)
+        {
+            for (int x = 0; x < Rocks[y].Length; x++)
+            {
+                if(Rocks[y][x] == Problem14.RoundRock)
+                    sb.Append(x + "," + y + ";");
+            }
+        }
+
+        return sb.ToString();
     }
 
     public void MoveUp()
