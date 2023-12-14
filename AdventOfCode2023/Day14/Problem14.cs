@@ -17,10 +17,8 @@ public class Problem14
         RockFormation rockFormations = TranslateInput(inputLines);
         rockFormations.Spin2(1000000000);
 
-        return CalculateTotalLoad(rockFormations);
+        return CalculateLoad(rockFormations.Rocks);
     }
-
-
 
     #endregion
 
@@ -35,6 +33,22 @@ public class Problem14
         return CalculateTotalLoad(rockFormations);
     }
 
+
+    public static long CalculateLoad(char[][] rocks)
+    {
+        int size = rocks.Length;
+        int load = 0;
+        for (int r = 0; r < size; r++)
+        {
+            for (int c = 0; c < size; c++)
+            {
+                if (rocks[r][c] == 'O')
+                    load += size - r;
+            }
+        }
+
+        return load;
+    }
     public static long CalculateTotalLoad(RockFormation rockFormations)
     {
         char[][] rocks = rockFormations.Rocks;
