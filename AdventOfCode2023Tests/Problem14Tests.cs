@@ -308,7 +308,7 @@ _testOutputHelper.WriteLine(stopwatch.ElapsedMilliseconds.ToString());
         inputLines = inputLines.SelectMany(x => x.Split("\n")).ToList();
         var rockFormations = Problem14.TranslateInput(inputLines);
         var stopwatch = Stopwatch.StartNew();
-        rockFormations.Spin2(1000000);
+        rockFormations.Spin2(1000_000_000);
         _testOutputHelper.WriteLine(stopwatch.ElapsedMilliseconds.ToString());
 
         var result = Problem14.CalculateTotalLoad(rockFormations);

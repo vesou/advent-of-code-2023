@@ -84,21 +84,9 @@ public class RockFormation
     public RockFormation(List<string> rockFormationLines)
     {
         Rocks = rockFormationLines.Select(x => x.ToCharArray()).ToArray();
-        RoundRocks = new List<Rock>();
-        for (int y = 0; y < Rocks.Length; y++)
-        {
-            for (int x = 0; x < Rocks[y].Length; x++)
-            {
-                if (Rocks[y][x] == Problem14.RoundRock)
-                {
-                    RoundRocks.Add(new Rock { X = x, Y = y });
-                }
-            }
-        }
     }
 
     public char[][] Rocks { get; set; }
-    public List<Rock> RoundRocks { get; set; }
 
     public void Spin2(int numberOfSpins)
     {
@@ -113,56 +101,77 @@ public class RockFormation
 
     public void MoveUp()
     {
-        foreach (var rock in RoundRocks.OrderBy(rock => rock.Y))
+        for (int y = 1; y < Rocks.Length; y++)
         {
-            int newY = FindLowestY(rock.X, rock.Y);
-            if (newY < rock.Y)
+            for (int x = 0; x < Rocks[y].Length; x++)
             {
-                Rocks[newY][rock.X] = Problem14.RoundRock;
-                Rocks[rock.Y][rock.X] = Problem14.Space;
-                rock.Y = newY;
+                if (Rocks[y][x] != Problem14.RoundRock)
+                    continue;
+
+                int newY = FindLowestY(x, y);
+                if (newY < y)
+                {
+                    Rocks[newY][x] = Problem14.RoundRock;
+                    Rocks[y][x] = Problem14.Space;
+                }
             }
         }
     }
 
     public void MoveDown()
     {
-        foreach (var rock in RoundRocks.OrderByDescending(rock => rock.Y))
+        for (int y = Rocks.Length - 2; y >= 0; y--)
         {
-            int newY = FindHighestY(rock.X, rock.Y);
-            if (newY > rock.Y)
+            for (int x = 0; x < Rocks[y].Length; x++)
             {
-                Rocks[newY][rock.X] = Problem14.RoundRock;
-                Rocks[rock.Y][rock.X] = Problem14.Space;
-                rock.Y = newY;
+                if (Rocks[y][x] != Problem14.RoundRock)
+                    continue;
+
+                int newY = FindHighestY(x, y);
+                if (newY > y)
+                {
+                    Rocks[newY][x] = Problem14.RoundRock;
+                    Rocks[y][x] = Problem14.Space;
+                }
             }
         }
     }
 
     public void MoveLeft()
     {
-        foreach (var rock in RoundRocks.OrderBy(rock => rock.X))
+        for (int y = 0; y < Rocks.Length; y++)
         {
-            int newX = FindLowestX(rock.X, rock.Y);
-            if (newX < rock.X)
+            for (int x = 1; x < Rocks[y].Length; x++)
             {
-                Rocks[rock.Y][newX] = Problem14.RoundRock;
-                Rocks[rock.Y][rock.X] = Problem14.Space;
-                rock.X = newX;
+                if (Rocks[y][x] != Problem14.RoundRock)
+                    continue;
+
+                int newX = FindLowestX(x, y);
+                if (newX < x)
+                {
+                    Rocks[y][newX] = Problem14.RoundRock;
+                    Rocks[y][x] = Problem14.Space;
+                    x = newX;
+                }
             }
         }
     }
 
     public void MoveRight()
     {
-        foreach (var rock in RoundRocks.OrderByDescending(rock => rock.X))
+        for (int y = 0; y < Rocks.Length; y++)
         {
-            int newX = FindHighestX(rock.X, rock.Y);
-            if (newX > rock.X)
+            for (int x = Rocks[y].Length - 2; x >= 0; x--)
             {
-                Rocks[rock.Y][newX] = Problem14.RoundRock;
-                Rocks[rock.Y][rock.X] = Problem14.Space;
-                rock.X = newX;
+                if (Rocks[y][x] != Problem14.RoundRock)
+                    continue;
+
+                int newX = FindHighestX(x, y);
+                if (newX > x)
+                {
+                    Rocks[y][newX] = Problem14.RoundRock;
+                    Rocks[y][x] = Problem14.Space;
+                }
             }
         }
     }
