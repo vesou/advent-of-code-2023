@@ -13,7 +13,7 @@ public class Problem14
         var inputLines = File.ReadAllLines("Day14/input1.txt").ToList();
 
         RockFormation rockFormations = TranslateInput(inputLines);
-        rockFormations.Spin(1000000000);
+        rockFormations.Spin2(1000000000);
 
         return CalculateTotalLoad(rockFormations);
     }
@@ -84,12 +84,140 @@ public class RockFormation
     public RockFormation(List<string> rockFormationLines)
     {
         Rocks = rockFormationLines.Select(x => x.ToCharArray()).ToArray();
+        RoundRocks = new List<Rock>();
+        for (int y = 0; y < Rocks.Length; y++)
+        {
+            for (int x = 0; x < Rocks[y].Length; x++)
+            {
+                if (Rocks[y][x] == Problem14.RoundRock)
+                {
+                    RoundRocks.Add(new Rock { X = x, Y = y });
+                }
+            }
+        }
     }
 
     public char[][] Rocks { get; set; }
+    public List<Rock> RoundRocks { get; set; }
+
+    public void Spin2(int numberOfSpins)
+    {
+        for (int i = 0; i < numberOfSpins; i++)
+        {
+            MoveUp();
+            MoveLeft();
+            MoveDown();
+            MoveRight();
+        }
+    }
+
+    public void MoveUp()
+    {
+        foreach (var rock in RoundRocks.OrderBy(rock => rock.Y))
+        {
+            int newY = FindLowestY(rock.X, rock.Y);
+            if (newY < rock.Y)
+            {
+                Rocks[newY][rock.X] = Problem14.RoundRock;
+                Rocks[rock.Y][rock.X] = Problem14.Space;
+                rock.Y = newY;
+            }
+        }
+    }
+
+    public void MoveDown()
+    {
+        foreach (var rock in RoundRocks.OrderByDescending(rock => rock.Y))
+        {
+            int newY = FindHighestY(rock.X, rock.Y);
+            if (newY > rock.Y)
+            {
+                Rocks[newY][rock.X] = Problem14.RoundRock;
+                Rocks[rock.Y][rock.X] = Problem14.Space;
+                rock.Y = newY;
+            }
+        }
+    }
+
+    public void MoveLeft()
+    {
+        foreach (var rock in RoundRocks.OrderBy(rock => rock.X))
+        {
+            int newX = FindLowestX(rock.X, rock.Y);
+            if (newX < rock.X)
+            {
+                Rocks[rock.Y][newX] = Problem14.RoundRock;
+                Rocks[rock.Y][rock.X] = Problem14.Space;
+                rock.X = newX;
+            }
+        }
+    }
+
+    public void MoveRight()
+    {
+        foreach (var rock in RoundRocks.OrderByDescending(rock => rock.X))
+        {
+            int newX = FindHighestX(rock.X, rock.Y);
+            if (newX > rock.X)
+            {
+                Rocks[rock.Y][newX] = Problem14.RoundRock;
+                Rocks[rock.Y][rock.X] = Problem14.Space;
+                rock.X = newX;
+            }
+        }
+    }
+
+    private int FindLowestX(int rockX, int rockY)
+    {
+        for (int x = rockX - 1; x >= 0; x--)
+        {
+            if(Rocks[rockY][x] == Problem14.Space)
+                continue;
+            return x + 1;
+        }
+
+        return 0;
+    }
+
+    private int FindHighestX(int rockX, int rockY)
+    {
+        for (int x = rockX + 1; x < Rocks[rockY].Length; x++)
+        {
+            if(Rocks[rockY][x] == Problem14.Space)
+                continue;
+            return x - 1;
+        }
+
+        return Rocks[rockY].Length - 1;
+    }
+
+    private int FindLowestY(int rockX, int rockY)
+    {
+        for (int y = rockY - 1; y >= 0; y--)
+        {
+            if(Rocks[y][rockX] == Problem14.Space)
+                continue;
+            return y + 1;
+        }
+
+        return 0;
+    }
+
+    private int FindHighestY(int rockX, int rockY)
+    {
+        for (int y = rockY + 1; y < Rocks.Length; y++)
+        {
+            if(Rocks[y][rockX] == Problem14.Space)
+                continue;
+            return y - 1;
+        }
+
+        return Rocks.Length - 1;
+    }
 
     public void Spin(int numberOfSpins)
     {
+        // TODO: maybe i could grab a list of roundRocks and iterate through them instead of the whole array
         for (int i = 0; i < numberOfSpins; i++)
         {
             Tilt(0, -1);
@@ -160,4 +288,10 @@ public class RockFormation
         Rocks[y][x] = Problem14.Space;
         MoveRoundRock(x + xChange, y + yChange, xChange, yChange);
     }
+}
+
+public class Rock
+{
+    public int X { get; set; }
+    public int Y { get; set; }
 }

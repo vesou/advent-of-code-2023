@@ -1,10 +1,19 @@
+using System.Diagnostics;
 using AdventOfCode2023.Day14;
 using FluentAssertions;
+using Xunit.Abstractions;
 
 namespace AdventOfCode2023Tests;
 
 public class Problem14Tests
 {
+    private readonly ITestOutputHelper _testOutputHelper;
+
+    public Problem14Tests(ITestOutputHelper testOutputHelper)
+    {
+        _testOutputHelper = testOutputHelper;
+    }
+
     [Fact]
     public void Solve1_FullTest()
     {
@@ -78,7 +87,7 @@ public class Problem14Tests
 
         inputLines = inputLines.SelectMany(x => x.Split("\n")).ToList();
         var rockFormations = Problem14.TranslateInput(inputLines);
-        rockFormations.Spin(1);
+        rockFormations.Spin2(1);
 
         rockFormations.Rocks[0].Should().BeEquivalentTo(expectedArray[0]);
         rockFormations.Rocks[1].Should().BeEquivalentTo(expectedArray[1]);
@@ -280,7 +289,27 @@ public class Problem14Tests
 
         inputLines = inputLines.SelectMany(x => x.Split("\n")).ToList();
         var rockFormations = Problem14.TranslateInput(inputLines);
-        rockFormations.Spin(1000000000);
+        var stopwatch = Stopwatch.StartNew();
+        rockFormations.Spin(1000000);
+_testOutputHelper.WriteLine(stopwatch.ElapsedMilliseconds.ToString());
+        var result = Problem14.CalculateTotalLoad(rockFormations);
+
+        result.Should().Be(64);
+    }
+
+    [Fact]
+    public void Solve2_SpinLoads2()
+    {
+        List<string> inputLines = new List<string>()
+        {
+            "O....#....\nO.OO#....#\n.....##...\nOO.#O....O\n.O.....O#.\nO.#..O.#.#\n..O..#O..O\n.......O..\n#....###..\n#OO..#...."
+        };
+
+        inputLines = inputLines.SelectMany(x => x.Split("\n")).ToList();
+        var rockFormations = Problem14.TranslateInput(inputLines);
+        var stopwatch = Stopwatch.StartNew();
+        rockFormations.Spin2(1000000);
+        _testOutputHelper.WriteLine(stopwatch.ElapsedMilliseconds.ToString());
 
         var result = Problem14.CalculateTotalLoad(rockFormations);
 
