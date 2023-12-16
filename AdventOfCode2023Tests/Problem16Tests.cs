@@ -22,18 +22,36 @@ public class Problem16Tests
     }
 
     [Theory]
-    [InlineData(0, 34)]
-    public void Solve1_Test1(int x, int expectedResult)
+    [InlineData(Problem16.Up, Problem16.MirrorLeft, Problem16.Left)]
+    [InlineData(Problem16.Up, Problem16.MirrorRight, Problem16.Right)]
+    [InlineData(Problem16.Down, Problem16.MirrorLeft, Problem16.Right)]
+    [InlineData(Problem16.Down, Problem16.MirrorRight, Problem16.Left)]
+    [InlineData(Problem16.Left, Problem16.MirrorLeft, Problem16.Down)]
+    [InlineData(Problem16.Left, Problem16.MirrorRight, Problem16.Up)]
+    [InlineData(Problem16.Right, Problem16.MirrorLeft, Problem16.Up)]
+    [InlineData(Problem16.Right, Problem16.MirrorRight, Problem16.Down)]
+    public void Solve1_ChangeDirection(int x, char mirrorType, int expectedResult)
+    {
+        var result = Problem16.ChangeDirection(x, mirrorType);
+
+        result.Should().Be(expectedResult);
+    }
+
+    [Fact]
+    public void Solve1_Scenario1()
     {
         List<string> inputLines = new List<string>()
         {
-            "O....#....\nO.OO#....#\n.....##...\nOO.#O....O\n.O.....O#.\nO.#..O.#.#\n..O..#O..O\n.......O..\n#....###..\n#OO..#...."
+            ".|...\\....\n|.-.\\.....\n.....|-...\n........|.\n..........\n.........\\\n..../.\\\\..\n.-.-/..|..\n.|....-|.\\\n..//.|...."
         };
         inputLines = inputLines.SelectMany(x => x.Split("\n")).ToList();
         var data = Problem16.TranslateInput(inputLines);
-        long result = 0;
+        Problem16.ReflectLight(data);
 
-        result.Should().Be(expectedResult);
+        string test = Problem16.ShowVisitedPixels(data.VisitedPixel);
+        long result = Problem16.CountPixelsWithLight(data);
+
+        result.Should().Be(46);
     }
 
     [Fact]
