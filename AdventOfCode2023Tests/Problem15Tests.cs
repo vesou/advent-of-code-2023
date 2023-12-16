@@ -62,6 +62,6 @@ public class Problem15Tests
     {
         var result = Problem15.Solve2();
 
-        result.Should().Be(0);
+        result.Should().Be(244461);
     }
 }
