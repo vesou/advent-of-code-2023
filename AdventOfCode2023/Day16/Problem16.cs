@@ -21,7 +21,85 @@ public class Problem16
     {
         var inputLines = File.ReadAllLines($"Day{Day}/input1.txt").ToList();
 
-        return 0;
+        Data data = TranslateInput(inputLines);
+        return FindBestLightReflectionScore(data);
+    }
+
+    public static long FindBestLightReflectionScore(Data data)
+    {
+        long bestResult = 0;
+
+        List<Point> startingPoints = new List<Point>();
+
+        // top row
+        for (int x = 0; x < data.Grid.GetLength(1); x++)
+        {
+            startingPoints.Add(new Point(x, 0));
+        }
+        long bestResultGoingOneDirection = FindBestResultGoingOneDirection(data, Down, startingPoints);
+        if(bestResultGoingOneDirection > bestResult)
+            bestResult = bestResultGoingOneDirection;
+
+        // bottom row
+        for (int x = 0; x < data.Grid.GetLength(1); x++)
+        {
+            startingPoints.Add(new Point(x, data.Grid.GetLength(0) - 1));
+        }
+        bestResultGoingOneDirection = FindBestResultGoingOneDirection(data, Up, startingPoints);
+        if(bestResultGoingOneDirection > bestResult)
+            bestResult = bestResultGoingOneDirection;
+
+        // left row
+        for (int y = 0; y < data.Grid.GetLength(0); y++)
+        {
+            startingPoints.Add(new Point(0, y));
+        }
+        bestResultGoingOneDirection = FindBestResultGoingOneDirection(data, Right, startingPoints);
+        if(bestResultGoingOneDirection > bestResult)
+            bestResult = bestResultGoingOneDirection;
+
+        // right row
+        for (int y = 0; y < data.Grid.GetLength(0); y++)
+        {
+            startingPoints.Add(new Point(data.Grid.GetLength(1) - 1, y));
+        }
+        bestResultGoingOneDirection = FindBestResultGoingOneDirection(data, Left, startingPoints);
+        if(bestResultGoingOneDirection > bestResult)
+            bestResult = bestResultGoingOneDirection;
+
+
+        return bestResult;
+    }
+
+    private static long FindBestResultGoingOneDirection(Data data, int direction, List<Point> startingPoints)
+    {
+        long bestResult = 0;
+        foreach (var startingPoint in startingPoints)
+        {
+            data.VisitedPixel = ClearVisitedPixels(data.VisitedPixel);
+            ReflectLight(data, startingPoint.X, startingPoint.Y, direction);
+            long result = CountPixelsWithLight(data);
+            if(result > bestResult)
+                bestResult = result;
+        }
+
+        return bestResult;
+    }
+
+    private static int[,][] ClearVisitedPixels(int[,][] visitedPixels)
+    {
+        for (int y = 0; y < visitedPixels.GetLength(0); y++)
+        {
+            for (int x = 0; x < visitedPixels.GetLength(1); x++)
+            {
+                for (int i = 0; i < visitedPixels[y, x].Length; i++)
+                {
+                    visitedPixels[y, x][i] = 0;
+                }
+            }
+        }
+
+        return visitedPixels;
     }
 
     #endregion
@@ -199,7 +277,7 @@ public class Problem16
 }
 
 
-    public class Data
+public class Data
 {
     public Data(List<string> inputLines)
     {
@@ -218,4 +296,16 @@ public class Problem16
 
     public char[,] Grid { get; set; }
     public int[,][] VisitedPixel { get; set; }
+}
+
+public class Point
+{
+    public Point(int x, int y)
+    {
+        X = x;
+        Y = y;
+    }
+
+    public int X { get; set; }
+    public int Y { get; set; }
 }

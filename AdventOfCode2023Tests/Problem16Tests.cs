@@ -55,10 +55,28 @@ public class Problem16Tests
     }
 
     [Fact]
+    public void Solve2_Scenario1()
+    {
+        List<string> inputLines = new List<string>()
+        {
+            ".|...\\....\n|.-.\\.....\n.....|-...\n........|.\n..........\n.........\\\n..../.\\\\..\n.-.-/..|..\n.|....-|.\\\n..//.|...."
+        };
+        inputLines = inputLines.SelectMany(x => x.Split("\n")).ToList();
+        var data = Problem16.TranslateInput(inputLines);
+        Problem16.ReflectLight(data);
+
+        string test = Problem16.ShowVisitedPixels(data.VisitedPixel);
+        long result = Problem16.FindBestLightReflectionScore(data);
+
+        result.Should().Be(51);
+    }
+
+
+    [Fact]
     public void Solve2_FullTest()
     {
         var result = Problem16.Solve2();
 
-        result.Should().Be(0);
+        result.Should().Be(8491);
     }
 }
