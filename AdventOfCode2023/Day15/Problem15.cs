@@ -10,7 +10,87 @@ public class Problem15
     {
         var inputLines = File.ReadAllLines($"Day{Day}/input1.txt").ToList();
 
-        return 0;
+        Data data = TranslateInput(string.Join("\n", inputLines));
+
+        ReadAllInstructions(data);
+
+        return SumFocusingPower(data);
+    }
+
+    public static long SumFocusingPower(Data data)
+    {
+        long totalPower = 0;
+        for (int i = 0; i < data.Boxes.Length; i++)
+        {
+            for (int lensIndex = 0; lensIndex < data.Boxes[i].Lenses.Count; lensIndex++)
+            {
+                long lensPower = i + 1;
+                Lens lens = data.Boxes[i].Lenses[lensIndex];
+                lensPower *= lensIndex + 1;
+                lensPower *= lens.FocalLength;
+                totalPower += lensPower;
+            }
+        }
+
+        return totalPower;
+    }
+
+    public static void ReadAllInstructions(Data data)
+    {
+        foreach (string initializationSequence in data.InitializationSequences)
+        {
+            ReadInstruction(initializationSequence, data.Boxes);
+        }
+    }
+
+    private static void ReadInstruction(string initializationSequence, Box[] dataBoxes)
+    {
+        string label = GetLabel(initializationSequence);
+        int? focalLength = GetFocalLength(initializationSequence);
+        int labelIndex = GetHash(label);
+        int indexOfExistingLens = dataBoxes[labelIndex].Lenses.FindIndex(x => x.Label == label);
+        if (focalLength is not null)
+        {
+            UpdateLenseInBox(dataBoxes[labelIndex], label, focalLength.Value, indexOfExistingLens);
+            return;
+        }
+
+        RemoveLensFromBox(dataBoxes[labelIndex], indexOfExistingLens);
+    }
+
+    private static void RemoveLensFromBox(Box dataBox, int indexOfExistingLens)
+    {
+        if (indexOfExistingLens == -1) return;
+
+        dataBox.Lenses.RemoveAt(indexOfExistingLens);
+    }
+
+    private static int? GetFocalLength(string initializationSequence)
+    {
+        var labelInfo = initializationSequence.Split("=");
+        if (labelInfo.Length > 1)
+            return int.Parse(labelInfo[1]);
+
+        return null;
+    }
+
+    private static void UpdateLenseInBox(Box dataBoxes, string label, int focalLength, int index)
+    {
+        if (index == -1)
+        {
+            dataBoxes.Lenses.Add(new Lens {Label = label, FocalLength = focalLength});
+            return;
+        }
+
+        dataBoxes.Lenses[index].FocalLength = focalLength;
+    }
+
+    private static string GetLabel(string initializationSequence)
+    {
+        var labelInfo = initializationSequence.Split("=");
+        if (labelInfo.Length > 1) return labelInfo[0];
+
+        return initializationSequence.Split("-")[0];
     }
 
     #endregion
@@ -64,7 +144,29 @@ public class Data
     {
         InitializationSequences = inputLine.Split(",").ToList();
         InitializationSequences.RemoveAll(s => string.IsNullOrWhiteSpace(s));
+        Boxes = new Box[256];
+        for (int i = 0; i < Boxes.Length; i++)
+        {
+            Boxes[i] = new Box();
+        }
     }
 
     public List<string> InitializationSequences { get; set; }
+    public Box[] Boxes { get; set; }
+}
+
+public class Box
+{
+    public Box()
+    {
+        Lenses = new List<Lens>();
+    }
+
+    public List<Lens> Lenses { get; set; }
+}
+
+public class Lens
+{
+    public string Label { get; set; }
+    public int FocalLength { get; set; } = 1;
 }
