@@ -18,14 +18,14 @@ public class Problem16Tests
     {
         var result = Problem16.Solve1();
 
-        result.Should().Be(0);
+        result.Should().Be(8323);
     }
 
     [Theory]
-    [InlineData(Problem16.Up, Problem16.MirrorLeft, Problem16.Left)]
-    [InlineData(Problem16.Up, Problem16.MirrorRight, Problem16.Right)]
-    [InlineData(Problem16.Down, Problem16.MirrorLeft, Problem16.Right)]
-    [InlineData(Problem16.Down, Problem16.MirrorRight, Problem16.Left)]
+    [InlineData(Problem16.Up, Problem16.MirrorLeft, Problem16.Right)]
+    [InlineData(Problem16.Up, Problem16.MirrorRight, Problem16.Left)]
+    [InlineData(Problem16.Down, Problem16.MirrorLeft, Problem16.Left)]
+    [InlineData(Problem16.Down, Problem16.MirrorRight, Problem16.Right)]
     [InlineData(Problem16.Left, Problem16.MirrorLeft, Problem16.Down)]
     [InlineData(Problem16.Left, Problem16.MirrorRight, Problem16.Up)]
     [InlineData(Problem16.Right, Problem16.MirrorLeft, Problem16.Up)]
