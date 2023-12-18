@@ -1,4 +1,5 @@
 using AdventOfCode2023.Day17;
+using AdventOfCode2023.Day17.part2;
 using FluentAssertions;
 using Xunit.Abstractions;
 
@@ -81,5 +82,35 @@ public class Problem17Tests
         var result = Problem17.Solve2();
 
         result.Should().Be(0);
+    }
+
+    [Theory]
+    [InlineData(0, 0,   94)]
+    public void Solve2_TestDijkstra(int x, int y, int expectedResult)
+    {
+        List<string> inputLines = new List<string>()
+        {
+            "2413432311323\n3215453535623\n3255245654254\n3446585845452\n4546657867536\n1438598798454\n4457876987766\n3637877979653\n4654967986887\n4564679986453\n1224686865563\n2546548887735\n4322674655533"
+        };
+        inputLines = inputLines.SelectMany(x => x.Split("\n")).ToList();
+        var data = Problem17.TranslateInput(inputLines);
+        var result = DijkstraAlgorithm2.Dijkstra(data.Grid, x, y, data.Grid.GetLength(1)-1, data.Grid.GetLength(0)-1);
+
+        result.Should().Be(expectedResult);
+    }
+
+    [Theory]
+    [InlineData(0, 0,   71)]
+    public void Solve2_TestDijkstra2(int x, int y, int expectedResult)
+    {
+        List<string> inputLines = new List<string>()
+        {
+            "111111111111\n999999999991\n999999999991\n999999999991\n999999999991"
+        };
+        inputLines = inputLines.SelectMany(x => x.Split("\n")).ToList();
+        var data = Problem17.TranslateInput(inputLines);
+        var result = DijkstraAlgorithm2.Dijkstra(data.Grid, x, y, data.Grid.GetLength(1)-1, data.Grid.GetLength(0)-1);
+
+        result.Should().Be(expectedResult);
     }
 }

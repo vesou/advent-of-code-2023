@@ -1,3 +1,5 @@
+using AdventOfCode2023.Day17.part2;
+
 namespace AdventOfCode2023.Day17;
 
 public class Problem17
@@ -14,7 +16,9 @@ public class Problem17
     {
         var inputLines = File.ReadAllLines($"Day{Day}/input1.txt").ToList();
 
-        return 0;
+        Data data = TranslateInput(inputLines);
+        var result = DijkstraAlgorithm2.Dijkstra(data.Grid, 0, 0, data.Grid.GetLength(1)-1, data.Grid.GetLength(0)-1);
+        return result;
     }
 
     #endregion
