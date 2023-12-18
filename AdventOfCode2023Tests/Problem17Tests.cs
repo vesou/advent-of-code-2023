@@ -81,7 +81,7 @@ public class Problem17Tests
     {
         var result = Problem17.Solve2();
 
-        result.Should().Be(0);
+        result.Should().Be(1266);
     }
 
     [Theory]
