@@ -10,7 +10,63 @@ public class Problem19
     {
         var inputLines = File.ReadAllLines($"Day{Day}/input1.txt").ToList();
 
-        return 0;
+        Data data = TranslateInput(inputLines);
+        data.Parts = new List<PartRating>();
+
+        return SumOfAllPossibleParts(data);
+    }
+
+    public static long SumOfAllPossibleParts(Data data)
+    {
+        // iterate through rules picking each rule true and false paths and limiting the possible values for each prop
+        // then if reached A workflow, multiple the possible values for each prop
+        List<RuleSet> allRulesLeadingToA = GetAllRulesLeadingToA(data);
+        long result = 0;
+        foreach (var ruleSet in allRulesLeadingToA)
+        {
+            result += ruleSet.GetCountOfAllPossibleValues();
+        }
+
+        return result;
+    }
+
+    private static List<RuleSet> GetAllRulesLeadingToA(Data data)
+    {
+        List<RuleSet> allRulesLeadingToA = new List<RuleSet>();
+        WorkflowRule currentRule = new WorkflowRule(data.Workflows.First(x => x.Name == "in"), 0, new RuleSet());
+        Queue<WorkflowRule> rulesToProcess = new Queue<WorkflowRule>();
+        rulesToProcess.Enqueue(currentRule);
+        while(rulesToProcess.Count > 0)
+        {
+            currentRule = rulesToProcess.Dequeue();
+            switch (currentRule.Workflow.Name)
+            {
+                case "A":
+                    allRulesLeadingToA.Add(currentRule.CurrentRuleSet);
+                    continue;
+                case "R":
+                    continue;
+            }
+
+            var rule = currentRule.Workflow.Rules[currentRule.CurrentRuleIndex];
+            // rule passes meaning workflow changes
+            WorkflowRule newPassingRule = new WorkflowRule(data.Workflows.First(x => x.Name == rule.OutputWorkflowName), 0, currentRule.CurrentRuleSet);
+            newPassingRule.CurrentRuleSet.AddRule(rule);
+            rulesToProcess.Enqueue(newPassingRule);
+
+            // a rule without a condition so we will not create an anti rule for it as it would definitely be rejected
+            if (rule.ConditionChar == "")
+            {
+                continue;
+            }
+
+            WorkflowRule newAntiRule =
+                new WorkflowRule(currentRule.Workflow, currentRule.CurrentRuleIndex + 1, currentRule.CurrentRuleSet);
+            newAntiRule.CurrentRuleSet.AddAntiRule(rule);
+            rulesToProcess.Enqueue(newAntiRule);
+        }
+
+        return allRulesLeadingToA;
     }
 
     #endregion
@@ -165,11 +221,19 @@ public class Rule
         {
             OutputWorkflowName = parts[0];
             Condition = _ => true;
+            ConditionChar = "";
             return;
         }
         OutputWorkflowName = parts[1];
         Condition = GetPredicate(parts[0]);
+        ConditionChar = parts[0].Split('<', '>')[0];
+        ConditionValue = int.Parse(parts[0].Split('<', '>')[1]);
+        ConditionIsLessThen = parts[0].Contains('<');
     }
+
+    public bool ConditionIsLessThen { get; set; }
+
+    public int ConditionValue { get; set; }
 
     /// <summary>
     /// translates a string like a<2006 to a Predicate<PartRating> where a is smaller than 2006 returns true
@@ -187,19 +251,20 @@ public class Rule
         switch (parts[0])
         {
             case "a":
-                return x => lessThan ? x.A < int.Parse(parts[1]) : x.A > int.Parse(parts[1]);
+                return x => lessThan ? x.A == 0 || x.A < int.Parse(parts[1]) : x.A == 0 || x.A > int.Parse(parts[1]);
             case "m":
-                return x => lessThan ? x.M < int.Parse(parts[1]) : x.M > int.Parse(parts[1]);
+                return x => lessThan ? x.M == 0 || x.M < int.Parse(parts[1]) : x.M == 0 || x.M > int.Parse(parts[1]);
             case "x":
-                return x => lessThan ? x.X < int.Parse(parts[1]) : x.X > int.Parse(parts[1]);
+                return x => lessThan ? x.X == 0 || x.X < int.Parse(parts[1]) : x.X == 0 || x.X > int.Parse(parts[1]);
             case "s":
-                return x => lessThan ? x.S < int.Parse(parts[1]) : x.S > int.Parse(parts[1]);
+                return x => lessThan ? x.S == 0 || x.S < int.Parse(parts[1]) : x.S == 0 || x.S > int.Parse(parts[1]);
             default:
                 throw new NotImplementedException();
         }
     }
 
     public Predicate<PartRating> Condition { get; set; }
+    public string ConditionChar { get; set; }
 
     public string OutputWorkflowName { get; set; }
 }
@@ -235,8 +300,125 @@ public class PartRating
         }
     }
 
+    public PartRating(string propName, int propValue)
+    {
+        switch (propName)
+        {
+            case "x":
+                X = propValue;
+                break;
+            case "m":
+                M = propValue;
+                break;
+            case "a":
+                A = propValue;
+                break;
+            case "s":
+                S = propValue;
+                break;
+        }
+    }
+
     public int X { get; set; }
     public int M { get; set; }
     public int A { get; set; }
     public int S { get; set; }
+}
+
+public class RuleSet
+{
+    public RuleSet()
+    {
+        XConditions = new List<Predicate<int>>();
+        MConditions = new List<Predicate<int>>();
+        AConditions = new List<Predicate<int>>();
+        SConditions = new List<Predicate<int>>();
+    }
+
+    public void AddRule(Rule rule)
+    {
+        switch (rule.ConditionChar)
+        {
+            case "x":
+                XConditions.Add(new Predicate<int>(x => rule.ConditionIsLessThen ? x < rule.ConditionValue : x > rule.ConditionValue));
+                break;
+            case "m":
+                MConditions.Add(new Predicate<int>(x => rule.ConditionIsLessThen ? x < rule.ConditionValue : x > rule.ConditionValue));
+                break;
+            case "a":
+                AConditions.Add(new Predicate<int>(x => rule.ConditionIsLessThen ? x < rule.ConditionValue : x > rule.ConditionValue));
+                break;
+            case "s":
+                SConditions.Add(new Predicate<int>(x => rule.ConditionIsLessThen ? x < rule.ConditionValue : x > rule.ConditionValue));
+                break;
+        }
+    }
+
+    public void AddAntiRule(Rule rule)
+    {
+        switch (rule.ConditionChar)
+        {
+            case "x":
+                XConditions.Add(new Predicate<int>(x => rule.ConditionIsLessThen ? x >= rule.ConditionValue : x <= rule.ConditionValue));
+                break;
+            case "m":
+                MConditions.Add(new Predicate<int>(x => rule.ConditionIsLessThen ? x >= rule.ConditionValue : x <= rule.ConditionValue));
+                break;
+            case "a":
+                AConditions.Add(new Predicate<int>(x => rule.ConditionIsLessThen ? x >= rule.ConditionValue : x <= rule.ConditionValue));
+                break;
+            case "s":
+                SConditions.Add(new Predicate<int>(x => rule.ConditionIsLessThen ? x >= rule.ConditionValue : x <= rule.ConditionValue));
+                break;
+        }
+    }
+
+    public int GetCountOfAllPossibleValues()
+    {
+        return GetCountOfPossibleValue(XConditions) * GetCountOfPossibleValue(MConditions) * GetCountOfPossibleValue(AConditions) * GetCountOfPossibleValue(SConditions);
+    }
+
+    /// <summary>
+    /// applies all conditions to the list of possible values and returns the count of possible values based on a integer value being between 1 and 4000
+    /// </summary>
+    /// <param name="conditions"></param>
+    /// <returns></returns>
+    private int GetCountOfPossibleValue(List<Predicate<int>> conditions)
+    {
+        int count = 0;
+        for (int i = 1; i <= 4000; i++)
+        {
+            if (conditions.TrueForAll(x => x(i)))
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    public List<Predicate<int>> XConditions { get; set; }
+    public List<Predicate<int>> MConditions { get; set; }
+    public List<Predicate<int>> AConditions { get; set; }
+    public List<Predicate<int>> SConditions { get; set; }
+}
+
+public class WorkflowRule
+{
+    public WorkflowRule(Workflow workflow, int ruleIndex, RuleSet ruleSet)
+    {
+        Workflow = workflow;
+        CurrentRuleIndex = ruleIndex;
+        CurrentRuleSet = new RuleSet()
+        {
+            XConditions = ruleSet.XConditions.ToList(),
+            MConditions = ruleSet.MConditions.ToList(),
+            AConditions = ruleSet.AConditions.ToList(),
+            SConditions = ruleSet.SConditions.ToList()
+        };
+    }
+
+    public Workflow Workflow { get; set; }
+    public int CurrentRuleIndex { get; set; }
+    public RuleSet CurrentRuleSet { get; set; }
 }
