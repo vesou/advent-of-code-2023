@@ -209,6 +209,9 @@ public class Workflow
 
 public class Rule
 {
+    public Rule()
+    {
+    }
     /// <summary>
     /// translates a string like a<2006:qkq to a Rule where Condition = a<2006 and OutputWorkflowName = qkq
     /// another example m>2090:A
@@ -323,16 +326,33 @@ public class PartRating
     public int M { get; set; }
     public int A { get; set; }
     public int S { get; set; }
+
+    public int GetPropValue(string ruleConditionChar)
+    {
+        switch (ruleConditionChar)
+        {
+            case "x":
+                return X;
+            case "m":
+                return M;
+            case "a":
+                return A;
+            case "s":
+                return S;
+            default:
+                throw new NotImplementedException();
+        }
+    }
 }
 
 public class RuleSet
 {
     public RuleSet()
     {
-        XConditions = new List<Predicate<int>>();
-        MConditions = new List<Predicate<int>>();
-        AConditions = new List<Predicate<int>>();
-        SConditions = new List<Predicate<int>>();
+        XConditions = new List<Rule>();
+        MConditions = new List<Rule>();
+        AConditions = new List<Rule>();
+        SConditions = new List<Rule>();
     }
 
     public void AddRule(Rule rule)
@@ -340,40 +360,56 @@ public class RuleSet
         switch (rule.ConditionChar)
         {
             case "x":
-                XConditions.Add(new Predicate<int>(x => rule.ConditionIsLessThen ? x < rule.ConditionValue : x > rule.ConditionValue));
+                XConditions.Add(rule);
                 break;
             case "m":
-                MConditions.Add(new Predicate<int>(x => rule.ConditionIsLessThen ? x < rule.ConditionValue : x > rule.ConditionValue));
+                MConditions.Add(rule);
                 break;
             case "a":
-                AConditions.Add(new Predicate<int>(x => rule.ConditionIsLessThen ? x < rule.ConditionValue : x > rule.ConditionValue));
+                AConditions.Add(rule);
                 break;
             case "s":
-                SConditions.Add(new Predicate<int>(x => rule.ConditionIsLessThen ? x < rule.ConditionValue : x > rule.ConditionValue));
+                SConditions.Add(rule);
                 break;
         }
     }
 
     public void AddAntiRule(Rule rule)
     {
+        Rule antiRule = new Rule()
+        {
+            ConditionChar = rule.ConditionChar,
+            ConditionIsLessThen = !rule.ConditionIsLessThen,
+            ConditionValue = rule.ConditionValue,
+            OutputWorkflowName = rule.OutputWorkflowName,
+            Condition = (rating =>
+            {
+                if(rule.ConditionIsLessThen)
+                {
+                    return rating.GetPropValue(rule.ConditionChar) >= rule.ConditionValue;
+                }
+
+                return rating.GetPropValue(rule.ConditionChar) <= rule.ConditionValue;
+            })
+        };
         switch (rule.ConditionChar)
         {
             case "x":
-                XConditions.Add(new Predicate<int>(x => rule.ConditionIsLessThen ? x >= rule.ConditionValue : x <= rule.ConditionValue));
+                XConditions.Add(antiRule);
                 break;
             case "m":
-                MConditions.Add(new Predicate<int>(x => rule.ConditionIsLessThen ? x >= rule.ConditionValue : x <= rule.ConditionValue));
+                MConditions.Add(antiRule);
                 break;
             case "a":
-                AConditions.Add(new Predicate<int>(x => rule.ConditionIsLessThen ? x >= rule.ConditionValue : x <= rule.ConditionValue));
+                AConditions.Add(antiRule);
                 break;
             case "s":
-                SConditions.Add(new Predicate<int>(x => rule.ConditionIsLessThen ? x >= rule.ConditionValue : x <= rule.ConditionValue));
+                SConditions.Add(antiRule);
                 break;
         }
     }
 
-    public int GetCountOfAllPossibleValues()
+    public long GetCountOfAllPossibleValues()
     {
         return GetCountOfPossibleValue(XConditions) * GetCountOfPossibleValue(MConditions) * GetCountOfPossibleValue(AConditions) * GetCountOfPossibleValue(SConditions);
     }
@@ -383,12 +419,12 @@ public class RuleSet
     /// </summary>
     /// <param name="conditions"></param>
     /// <returns></returns>
-    private int GetCountOfPossibleValue(List<Predicate<int>> conditions)
+    private long GetCountOfPossibleValue(List<Rule> conditions)
     {
-        int count = 0;
+        long count = 0;
         for (int i = 1; i <= 4000; i++)
         {
-            if (conditions.TrueForAll(x => x(i)))
+            if (conditions.TrueForAll(x => x.Condition(new PartRating(x.ConditionChar, i))))
             {
                 count++;
             }
@@ -397,10 +433,10 @@ public class RuleSet
         return count;
     }
 
-    public List<Predicate<int>> XConditions { get; set; }
-    public List<Predicate<int>> MConditions { get; set; }
-    public List<Predicate<int>> AConditions { get; set; }
-    public List<Predicate<int>> SConditions { get; set; }
+    public List<Rule> XConditions { get; set; }
+    public List<Rule> MConditions { get; set; }
+    public List<Rule> AConditions { get; set; }
+    public List<Rule> SConditions { get; set; }
 }
 
 public class WorkflowRule

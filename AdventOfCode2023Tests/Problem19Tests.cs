@@ -54,6 +54,6 @@ public class Problem19Tests
     {
         var result = Problem19.Solve2();
 
-        result.Should().Be(0);
+        result.Should().Be(130303473508222);
     }
 }
